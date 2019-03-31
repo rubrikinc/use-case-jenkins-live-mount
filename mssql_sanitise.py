@@ -21,4 +21,4 @@ print "Connecting to "+sql_host+"\\"+sql_instance+" and DB: "+sql_db_name+"-"+sq
 cnxn = pyodbc.connect("Driver={ODBC Driver 13 for SQL Server};Server="+sql_host+"\\"+sql_instance+",1433;Database="+sql_db_name+"-"+sql_mount_suffix+";UID="+sql_user+";PWD="+sql_pass)
 
 cursor = cnxn.cursor()
-cursor.execute('UPDATE Person.EmailAddress SET EmailAddress = xxxxxx@xxxxx.com')
+cursor.execute('UPDATE Person.EmailAddress SET EmailAddress = "xxxxxx@xxxxx.com"')
