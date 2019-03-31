@@ -1,0 +1,132 @@
+#!groovy
+node{
+    currentBuild.result = "SUCCESS"
+
+    try {
+       stage('Checkout'){
+          checkout scm
+       }
+
+      stage('SQL Live Mount'){
+        env.NODE_ENV = 'Dev'
+
+        print "DEBUG: parameter rubrik_ip = ${RUBRIK_IP}"
+        print "DEBUG: parameter SQL_HOST = ${SQL_HOST}"
+        print "DEBUG: parameter SQL_Instance = ${SQL_INSTANCE}"
+        print "DEBUG: parameter SQL_DB_NAME = ${SQL_DB_NAME}"
+        print "DEBUG: parameter SQL Suffix = ${SQL_MOUNT_PREFIX}"
+
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'RubrikClusterLogon', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+
+          print "Mounting most recent snapshot..."
+          sh 'python -u sql_live_mount.py -ip "$RUBRIK_IP" -u "$USERNAME" -p "$PASSWORD" -s "$SQL_HOST" -i "$SQL_INSTANCE" -d "$SQL_DB_NAME" -x "$SQL_MOUNT_PREFIX"'
+        }
+      }
+
+      stage('Test MSSQL Connection') {
+          withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'RubrikClusterLogon', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+              withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'SQLCreds', usernameVariable: 'USERNAMESQL', passwordVariable: 'PASSWORDSQL']]) {
+                  print "Testing Connection to MSSQL"
+                  sh 'python -u test_mssql_connection.py -s "$SQL_HOST" -i "$SQL_INSTANCE" -d "$SQL_DB_NAME" -x "$SQL_MOUNT_PREFIX" -u "$USERNAMESQL" -p "$PASSWORDSQL"'
+              }
+          }
+      }
+
+      stage('Build'){
+      print "Build HTTPD Config"
+          node('ad-apache-demo') {
+              print "Environment Build Started for : ${env.NODE_ENV}"
+              withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'SQLCreds', usernameVariable: 'USERNAMESQL', passwordVariable: 'PASSWORDSQL']]) {
+                  sh '''
+                        #!/bin/sh
+                        yum install epel-release -y
+                        yum install python-pip -y
+                        HOSTNAME=$(cat /etc/hostname)
+                        HTTPDCHECK=$(yum list installed | grep -q -i httpd || exit 0)
+                        if [ $HOSTNAME == \\"${vmname}\\" ]; then
+                          sethostname=$(hostnamectl set-hostname ad-apache-demo)
+                        else
+                          printf '%s\n' "Hostname already set"
+                        fi
+                        printf '%s\n' "Updating Packages"
+                        yum update -y
+                        printf '%s\n' "Checking Apache..."
+                        if [ -z \"$HTTPDCHECK\" ]; then
+                          printf '%s\n' "$PACKAGE is not installed. Installing Apache(httpd)..."
+                          yum install httpd php -y
+                          firewall-cmd --zone=public --add-port=80/tcp --permanent
+                          firewall-cmd --zone=public --add-port=443/tcp --permanent
+                          firewall-cmd --reload
+                          exit 0
+                        else
+                          printf '%s\n' "Package $PACKAGE Already Installed"
+                          exit 0
+                        fi
+                        cat <<'EOF' > /var/www/html/data.php
+                        <?php
+                        
+                        $host = "$SQL_HOST";
+                        $port = '1433';
+                        $server = $host . ',' . $port;
+                        $database = "$SQL_DB_NAME" + "$SQL_MOUNT_PREFIX";
+                        $user = "$USERNAMESQL";
+                        $password = "$PASSWORDSQL";
+                        
+                        $link = mssql_connect ($server, $user, $password);
+                        
+                        if (!$link){
+                            die('ERROR: Could not connect: ' . mssql_get_last_message());
+                        }
+                        
+                        mssql_select_db($database);
+                        $query = 'select * from person.address';
+                        $result = mssql_query($query);
+                        
+                        if (!$result){
+                            $message = 'ERROR: ' . mssql_get_last_message();
+                            return $message;
+                        } else {
+                            $i = 0;
+                            echo '<html><body><table><tr>';
+                            while ($i < mssql_num_fields($result)){
+                                $meta = mssql_fetch_field($result, $i);
+                                echo '<td>' . $meta->name . '</td>';
+                                $i = $i + 1;
+                            }
+                            
+                            echo '</tr>';
+                            while ( ($row = mssql_fetch_row($result))){
+                                $count = count($row);
+                                $y = 0;
+                                echo '<tr>';
+                                while ($y < $count) {
+                                    $c_row = current($row);
+                                    echo '<td>' . $c_row . '</td>';
+                                    next($row);
+                                    $y = $y + 1;
+                                }
+                                echo '</tr>';
+                            }
+                            mssql_free_result($result);
+                            echo '</table></body></html>';
+                        }
+                        ?>
+                        EOF
+                    '''
+              }
+          }
+      }
+
+      stage('Sanitise MSSQL'){
+        print "Sanitising Data from Tables"
+
+      }
+
+    }
+    catch (err) {
+
+        currentBuild.result = "FAILURE"
+        throw err
+
+    }
+}
