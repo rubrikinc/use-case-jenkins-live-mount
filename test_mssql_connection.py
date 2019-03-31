@@ -18,7 +18,7 @@ sql_mount_suffix = args.suffix
 sql_user = args.username
 sql_pass = args.password
 
-cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
+cnxn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
                       "Server="+sql_host+"\\"+sql_instance+";"
                       "Database="+sql_db_name+"-"+sql_mount_suffix+";"
                       "UID="+sql_user+";"
