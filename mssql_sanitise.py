@@ -29,7 +29,6 @@ sql_sp = ("""
             SET @STRSQL = CONCAT(\'UPDATE A SET A.\',@ColumnName, \'=\'\'\',@ColumnValue,\'\'\' FROM \',@TBName, \' A\')
             EXEC(@STRSQL)
         END
-        GO 
         """)
 
 print sql_sp
