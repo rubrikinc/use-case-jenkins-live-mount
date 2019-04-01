@@ -24,11 +24,9 @@ node{
       }
 
       stage('Test MSSQL Connection') {
-          withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'RubrikClusterLogon', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-              withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'SQLCreds', usernameVariable: 'USERNAMESQL', passwordVariable: 'PASSWORDSQL']]) {
-                  print "Testing Connection to MSSQL"
-                  sh 'python -u test_mssql_connection.py -s "$SQL_HOST" -i "$SQL_INSTANCE" -d "$SQL_DB_NAME" -x "$SQL_MOUNT_PREFIX" -u "$USERNAMESQL" -p "$PASSWORDSQL"'
-              }
+          withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'SQLCreds', usernameVariable: 'USERNAMESQL', passwordVariable: 'PASSWORDSQL']]) {
+              print "Testing Connection to MSSQL"
+              sh 'python -u test_mssql_connection.py -s "$SQL_HOST" -i "$SQL_INSTANCE" -d "$SQL_DB_NAME" -x "$SQL_MOUNT_PREFIX" -u "$USERNAMESQL" -p "$PASSWORDSQL"'
           }
       }
 
@@ -57,12 +55,10 @@ node{
                           firewall-cmd --zone=public --add-port=80/tcp --permanent
                           firewall-cmd --zone=public --add-port=443/tcp --permanent
                           firewall-cmd --reload
-                          exit 0
                         else
                           printf '%s\n' "Package $PACKAGE Already Installed"
-                          exit 0
                         fi
-                        cat <<'EOF' > /var/www/html/data.php
+                        cat > /var/www/html/data.php << EOF
                         <?php
                         
                         $host = "$SQL_HOST";
@@ -119,7 +115,10 @@ node{
 
       stage('Sanitise MSSQL'){
         print "Sanitising Data from Tables"
-
+          withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'SQLCreds', usernameVariable: 'USERNAMESQL', passwordVariable: 'PASSWORDSQL']]) {
+              print "Testing Connection to MSSQL"
+              sh 'python -u mssql_sanitise.py -s "$SQL_HOST" -i "$SQL_INSTANCE" -d "$SQL_DB_NAME" -x "$SQL_MOUNT_PREFIX" -u "$USERNAMESQL" -p "$PASSWORDSQL"'
+          }
       }
 
     }
