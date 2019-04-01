@@ -58,7 +58,7 @@ node{
                         else
                           printf '%s\n' "Package $PACKAGE Already Installed"
                         fi
-                        cat <<'EOF' > /var/www/html/data.php
+                        cat > /var/www/html/data.php << EOF
                         <?php
                         
                         $host = "$SQL_HOST";
@@ -108,7 +108,6 @@ node{
                         }
                         ?>
                         EOF
-                        exit 0
                     '''
               }
           }
