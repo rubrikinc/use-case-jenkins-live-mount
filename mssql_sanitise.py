@@ -26,3 +26,5 @@ cursor.execute('UPDATE A SET A.EmailAddress=\'xxxxxx@xxxxxx.com\' FROM Person.Em
 cursor.execute('SELECT TOP 10 [EmailAddress] FROM Person.EmailAddress')
 for row in cursor:
     print('row = %r' % (row,))
+
+cnxn.commit()  # commit all the records
