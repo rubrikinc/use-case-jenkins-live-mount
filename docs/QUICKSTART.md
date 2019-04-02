@@ -17,7 +17,26 @@ This demo will perform a live mount of the latest snapshot available for the spe
 
 * Linux-based OS
 * Python 2.7 min.
-* ODBC Drivers installed onto Jenkins Host:
+* Packages installed onto Jenkins Host (RHEL):
+
+```
+yum install git
+yum install python3
+yum install yum-utils
+yum groupinstall development
+yum install python3-request 
+yum install python-dateutil
+yum install open-vm-tolls
+yum install open-vm-tools
+yum install jq
+yum install pip
+yum install python-pip
+yum install python-devel
+yum install unixodbc unixodbc-dev
+```
+
+* ODBC Drivers installed onto Jenkins Host (RHEL):
+Use this URL for other distributions 
 https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-2017
 
 ```
@@ -36,6 +55,8 @@ source ~/.bashrc
 sudo yum install unixODBC-devel
 ```
 
+* Github plugin for Jenkins
+
 ## Project Credentials
 
 In order to make use of this specific jenkinsfile, setup the project as per steps below:
@@ -46,13 +67,22 @@ Before we build the project, we need to add the Rubrik Cluster Credentials:
 2. Select the Global Store by selecting Stores scoped to Jenkins 'Global'
 3. Inside global credentials, add a new credentials by select 'Add Credentials'
 4. Ensure the credentials are set as follows:
-* Kind: Username with Password
-* Scope: Global
-* Username: Rubrik Cluster Username
-* Password: Rubrik Cluster Password
-* ID: RubrikClusterLogon (This must be set to this name as this is referenced in the jenkinsfile)
-* Description(Optional): Add a description that identifies the credentials as Rubrik Cluster details
+    * Kind: Username with Password
+    * Scope: Global
+    * Username: Rubrik Cluster Username
+    * Password: Rubrik Cluster Password
+    * ID: RubrikClusterLogon (This must be set to this name as this is referenced in the jenkinsfile)
+    * Description(Optional): Add a description that identifies the credentials as Rubrik Cluster details
 5. Save the credentials and return to the Jenkins Homepage
+6. Inside global credentials, add a new credentials by select 'Add Credentials'
+7. Ensure the credentials are set as follows:
+    * Kind: Username with Password
+    * Scope: Global
+    * Username: SQL Server Username
+    * Password: SQL Server Password
+    * ID: SQLCreds (This must be set to this name as this is referenced in the jenkinsfile)
+    * Description(Optional): Add a description that identifies the credentials as SQL Server details
+8. Save the credentials and return to the Jenkins Homepage
 
 ## Project Pipeline
 
@@ -64,15 +94,15 @@ Before we build the project, we need to add the Rubrik Cluster Credentials:
 Type | Name | Default Value | Description
 --- | --- | --- | ---
 String | RUBRIK_IP | Required - Pre-populate with Floating Rubrik IP | Rubrik Floating Cluster IP Address
-String | SQL_HOST | Optional - Blank or pre-populate with the SQL Hostname | Provide the SQL Server Hostname
-String | SQL_INSTANCE | Optional - Blank or pre-populate with the SQL Instance Name | Provide the SQL Server Instance Name
-String | SQL_DB_NAME | Optional - Blank or pre-poulate with the SQL Database Name | Provide the SQL Database Name within the instance
-String | SQL_MOUNT_SUFFIX | Optional - Blank or pre-populate with the required identification suffix for this mount | Supply a suffix to identify the SQL Mount
+String | SQL_HOST | Required - Blank or pre-populate with the SQL Hostname | Provide the SQL Server Hostname
+String | SQL_INSTANCE | Required - Blank or pre-populate with the SQL Instance Name | Provide the SQL Server Instance Name
+String | SQL_DB_NAME | Required - Blank or pre-poulate with the SQL Database Name | Provide the SQL Database Name within the instance
+String | SQL_MOUNT_SUFFIX | Required - Blank or pre-populate with the required identification suffix for this mount | Supply a suffix to identify the SQL Mount
 
 5. Tick 'Trigger Builds Remotely (e.g. from scripts)' and provide the an Auth. Token (This can be alpha-numeric and is generated for this specific project)
 6. Within 'Pipeline' ensure definition is set to 'Pipeline script from SCM'
 7. Ensure SCM is then set to 'Git' or preferred Code Repository
-8. Provide the Repository URL preferably HTTPS e.g. https://github.com/Draper1/jenkins-live-mount-demo.git
+8. Provide the Repository URL preferably HTTPS e.g. https://github.com/rubrikinc/use-case-jenkins-live-mount.git
 9. (Optional) Specify credentials if required for SCM
 10. Set Branches to build to the specified branch in this case '*/master'
 11. Set script path to jenkinsfile (This is case sensitive, ensure it matches the case of your jenkinsfile in Git)

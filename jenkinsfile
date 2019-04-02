@@ -39,6 +39,14 @@ node{
                         #!/bin/sh
                         yum install epel-release -y
                         yum install python-pip -y
+                        setsebool -P httpd_can_network_connect=1
+                        yum install php php-fpm wget php-devel -y
+                        yum install --enablerepo=extras php-mssql -y
+                        yum groupinstall "Development Tools" -y
+                        curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo
+                        yum clean all
+                        yum update -y
+                        ACCEPT_EULA=Y yum install -y msodbcsql mssql-tools unixODBC-devel 
                         HOSTNAME=$(cat /etc/hostname)
                         HTTPDCHECK=$(yum list installed | grep -q -i httpd || exit 0)
                         if [ $HOSTNAME == \\"${vmname}\\" ]; then
@@ -51,63 +59,21 @@ node{
                         printf '%s\n' "Checking Apache..."
                         if [ -z \"$HTTPDCHECK\" ]; then
                           printf '%s\n' "$PACKAGE is not installed. Installing Apache(httpd)..."
-                          yum install httpd php -y
+                          yum install httpd -y
                           firewall-cmd --zone=public --add-port=80/tcp --permanent
                           firewall-cmd --zone=public --add-port=443/tcp --permanent
                           firewall-cmd --reload
                         else
                           printf '%s\n' "Package $PACKAGE Already Installed"
                         fi
-                        cat > /var/www/html/data.php << EOF
-                        <?php
+                        SQL_DB=$SQL_DB_NAME-$SQL_MOUNT_PREFIX
                         
-                        $host = "$SQL_HOST";
-                        $port = '1433';
-                        $server = $host . ',' . $port;
-                        $database = "$SQL_DB_NAME" + "$SQL_MOUNT_PREFIX";
-                        $user = "$USERNAMESQL";
-                        $password = "$PASSWORDSQL";
-                        
-                        $link = mssql_connect ($server, $user, $password);
-                        
-                        if (!$link){
-                            die('ERROR: Could not connect: ' . mssql_get_last_message());
-                        }
-                        
-                        mssql_select_db($database);
-                        $query = 'select * from person.address';
-                        $result = mssql_query($query);
-                        
-                        if (!$result){
-                            $message = 'ERROR: ' . mssql_get_last_message();
-                            return $message;
-                        } else {
-                            $i = 0;
-                            echo '<html><body><table><tr>';
-                            while ($i < mssql_num_fields($result)){
-                                $meta = mssql_fetch_field($result, $i);
-                                echo '<td>' . $meta->name . '</td>';
-                                $i = $i + 1;
-                            }
-                            
-                            echo '</tr>';
-                            while ( ($row = mssql_fetch_row($result))){
-                                $count = count($row);
-                                $y = 0;
-                                echo '<tr>';
-                                while ($y < $count) {
-                                    $c_row = current($row);
-                                    echo '<td>' . $c_row . '</td>';
-                                    next($row);
-                                    $y = $y + 1;
-                                }
-                                echo '</tr>';
-                            }
-                            mssql_free_result($result);
-                            echo '</table></body></html>';
-                        }
-                        ?>
-                        EOF
+                        wget -P /var/www/html/ https://raw.githubusercontent.com/Draper1/test-public/master/data.php
+                        sed -i "s/RUBRIK_LIVEMOUNT_DB/$SQL_DB/g" /var/www/html/data.php
+                        sed -i "s/RBK_SQL_HOST/$SQL_HOST/g" /var/www/html/data.php
+                        sed -i "s/RBK_SQL_INSTANCE/$SQL_INSTANCE/g" /var/www/html/data.php
+                        sed -i "s/SQL_USER/$USERNAMESQL/g" /var/www/html/data.php
+                        sed -i "s/SQL_PASSWORD/$PASSWORDSQL/g" /var/www/html/data.php
                     '''
               }
           }
