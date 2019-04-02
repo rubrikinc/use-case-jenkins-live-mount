@@ -67,7 +67,7 @@ node{
                           printf '%s\n' "Package $PACKAGE Already Installed"
                         fi
                         SQL_DB=$SQL_DB_NAME-$SQL_MOUNT_PREFIX
-                        SQL_SERVER="{$SQL_HOST}\\{$SQL_INSTANCE}"
+                        SQL_CON=$SQL_HOST\\\\$SQL_INSTANCE
                         
                         wget -P /var/www/html/ https://raw.githubusercontent.com/Draper1/test-public/master/data.php
                         sed -i "s/RUBRIK_LIVEMOUNT_DB/$SQL_DB/g" /var/www/html/data.php
