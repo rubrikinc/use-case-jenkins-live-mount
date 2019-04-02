@@ -73,13 +73,13 @@ node{
     </head>
     <body>
 <?php
-\$myDatabase = "$SQL_DB_NAME" + "-" + "$SQL_MOUNT_PREFIX";
-\$link = mssql_connect("$SQL_HOST\\$SQL_INSTANCE", $USERNAMESQL, $PASSWORDSQL);
-if (!\$link || !mssql_select_db($SQL_DB_NAME+"-"+$SQL_MOUNT_PREFIX, \$link)) {
+$myDatabase = "$SQL_DB_NAME" + "-" + "$SQL_MOUNT_PREFIX";
+$link = mssql_connect("$SQL_HOST\\$SQL_INSTANCE", $USERNAMESQL, $PASSWORDSQL);
+if (!$link || !mssql_select_db($SQL_DB_NAME+"-"+$SQL_MOUNT_PREFIX, $link)) {
     die('Unable to connect or select database!');
 }
-\$query = "SELECT EmailAddressID, EmailAddress, ModifiedDate FROM Person.EmailAddress";
-\$result = mssql_query($query);
+$query = "SELECT EmailAddressID, EmailAddress, ModifiedDate FROM Person.EmailAddress";
+$result = mssql_query($query);
 
 $o = '<table id="myTable">
   <thead>
@@ -91,12 +91,12 @@ $o = '<table id="myTable">
 
 while ( $record = mssql_fetch_array($result) )
 {
-  \$o .= '<tr><td>'.\$record ['EmailAddressID'].'</td><td>'.\$record ['EmailAddress'].'</td></tr>';
+  $o .= '<tr><td>'.$record ['EmailAddressID'].'</td><td>'.$record ['EmailAddress'].'</td></tr>';
 }
 
-\$o .= '</tbody></table>';
-echo \$o;
-mssql_free_result(\$query);
+$o .= '</tbody></table>';
+echo $o;
+mssql_free_result($query);
 ?>
 </body>
 </html>
