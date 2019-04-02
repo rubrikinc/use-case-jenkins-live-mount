@@ -1,4 +1,4 @@
-# use-case-jenkins-live-mount
+# Use Case: Jenkins CI/CD with Rubrik SQL Live Mount
 
 ## :blue_book: Documentation
 
