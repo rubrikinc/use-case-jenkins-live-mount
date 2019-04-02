@@ -74,7 +74,7 @@ Before we build the project, we need to add the Rubrik Cluster Credentials:
     * Password: Rubrik Cluster Password
     * ID: RubrikClusterLogon (This must be set to this name as this is referenced in the jenkinsfile)
     * Description(Optional): Add a description that identifies the credentials as Rubrik Cluster details
-    ![alt-text](docs/img/img1.png)
+    ![alt-text](/docs/img/img1.png)
 5. Save the credentials and return to the Jenkins Homepage
 6. Inside global credentials, add a new credentials by select 'Add Credentials'
 7. Ensure the credentials are set as follows:
@@ -84,18 +84,18 @@ Before we build the project, we need to add the Rubrik Cluster Credentials:
     * Password: SQL Server Password
     * ID: SQLCreds (This must be set to this name as this is referenced in the jenkinsfile)
     * Description(Optional): Add a description that identifies the credentials as SQL Server details
-    ![alt-text](docs/img/img2.png)
+    ![alt-text](/docs/img/img2.png)
 8. Save the credentials and return to the Jenkins Homepage
 
 ## Project Pipeline
 
 1. Create a new Pipeline Project within Jenkins - Give it a name e.g. Rubrik-Pipeline-SQL-Live-Mount
 
-![alt-text](docs/img/img3.png)
+![alt-text](/docs/img/img3.png)
 
 2. Tick 'GitHub Project' and provide the project URL
 
-![alt-text](docs/img/img4.png)
+![alt-text](/docs/img/img4.png)
 
 3. Tick 'This Project is parameterized'
 4. Add the following parameters:
@@ -108,23 +108,23 @@ String | SQL_INSTANCE | Required - Blank or pre-populate with the SQL Instance N
 String | SQL_DB_NAME | Required - Blank or pre-poulate with the SQL Database Name | Provide the SQL Database Name within the instance
 String | SQL_MOUNT_SUFFIX | Required - Blank or pre-populate with the required identification suffix for this mount | Supply a suffix to identify the SQL Mount
 
-![alt-text](docs/img/img5.png)
+![alt-text](/docs/img/img5.png)
 
 5. Tick 'Trigger Builds Remotely (e.g. from scripts)' and provide the an Auth. Token (This can be alpha-numeric and is generated for this specific project)
 
-![alt-text](docs/img/img6.png)
+![alt-text](/docs/img/img6.png)
 
 6. Within 'Pipeline' ensure definition is set to 'Pipeline script from SCM'
 7. Ensure SCM is then set to 'Git' or preferred Code Repository
 8. Provide the Repository URL preferably HTTPS e.g. https://github.com/rubrikinc/use-case-jenkins-live-mount.git
 9. (Optional) Specify credentials if required for SCM
 
-![alt-text](docs/img/img7.png)
+![alt-text](/docs/img/img7.png)
 
 10. Set Branches to build to the specified branch in this case '*/master'
 11. Set script path to jenkinsfile (This is case sensitive, ensure it matches the case of your jenkinsfile in Git)
 
-![alt-text](docs/img/img8.png)
+![alt-text](/docs/img/img8.png)
 
 
 12. Save the Pipeline
@@ -134,7 +134,7 @@ String | SQL_MOUNT_SUFFIX | Required - Blank or pre-populate with the required i
 Now that we have a valid project, we can build the project supplying the parameters, this can be done from within the Jenkins Console from within the Project selecting 'Build with Parameters'
 Upon build you will be prompted to supply the above parameters.
 
-![alt-text](docs/img/img9.png)
+![alt-text](/docs/img/img9.png)
 
 ## Remote Builds
 
