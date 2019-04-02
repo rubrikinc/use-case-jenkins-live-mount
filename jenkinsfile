@@ -82,7 +82,6 @@ node{
       stage('Sanitise MSSQL'){
         print "Sanitising Data from Tables"
           withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'SQLCreds', usernameVariable: 'USERNAMESQL', passwordVariable: 'PASSWORDSQL']]) {
-              print "Testing Connection to MSSQL"
               sh 'python -u mssql_sanitise.py -s "$SQL_HOST" -i "$SQL_INSTANCE" -d "$SQL_DB_NAME" -x "$SQL_MOUNT_PREFIX" -u "$USERNAMESQL" -p "$PASSWORDSQL"'
           }
       }
