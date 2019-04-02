@@ -66,41 +66,11 @@ node{
                         else
                           printf '%s\n' "Package $PACKAGE Already Installed"
                         fi
-cat > /var/www/html/data.php << EOF
-<html>
-    <head>
-        <title>Results</title>
-    </head>
-    <body>
-<?php
-\$myDatabase = "$SQL_DB_NAME" + "-" + "$SQL_MOUNT_PREFIX";
-\$link = mssql_connect("$SQL_HOST\\$SQL_INSTANCE", $USERNAMESQL, $PASSWORDSQL);
-if (!\$link || !mssql_select_db($SQL_DB_NAME+"-"+$SQL_MOUNT_PREFIX, \$link)) {
-    die('Unable to connect or select database!');
-}
-$query = "SELECT EmailAddressID, EmailAddress, ModifiedDate FROM Person.EmailAddress";
-$result = mssql_query($query);
-
-$o = '<table id="myTable">
-  <thead>
-  <tr>
-  <th>Email Address ID</th>
-  <th>Email Address</th>
-  </tr>
-  </thead><tbody>';
-
-while ( $record = mssql_fetch_array($result) )
-{
-  $o .= '<tr><td>'.$record ['EmailAddressID'].'</td><td>'.$record ['EmailAddress'].'</td></tr>';
-}
-
-$o .= '</tbody></table>';
-echo $o;
-mssql_free_result($query);
-?>
-</body>
-</html>
-EOF
+                        cp ./data.php /var/www/html/data.php
+                        sed -i "s/RUBRIK_LIVEMOUNT_DB/$SQL_DB_NAME+'-'+$SQL_MOUNT_PREFIX/g" /var/www/html/data.php
+                        sed -i "s/RUBRIK_SERVER/$SQL_HOST+'\\'+$SQL_INSTANCE/g" /var/www/html/data.php
+                        sed -i "s/SQL_USER/$USERNAMESQL/g" /var/www/html/data.php
+                        sed -i "s/SQL_PASSWORD/$PASSWORDSQL/g" /var/www/html/data.php
                     '''
               }
           }
