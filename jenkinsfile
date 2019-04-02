@@ -66,7 +66,7 @@ node{
                         else
                           printf '%s\n' "Package $PACKAGE Already Installed"
                         fi
-                        cp ./data.php /var/www/html/data.php
+                        cp data.php /var/www/html/data.php
                         sed -i "s/RUBRIK_LIVEMOUNT_DB/$SQL_DB_NAME+'-'+$SQL_MOUNT_PREFIX/g" /var/www/html/data.php
                         sed -i "s/RUBRIK_SERVER/$SQL_HOST+'\\'+$SQL_INSTANCE/g" /var/www/html/data.php
                         sed -i "s/SQL_USER/$USERNAMESQL/g" /var/www/html/data.php
