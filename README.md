@@ -4,7 +4,7 @@
 
 Here are some resources to get you started! If you find any challenges from this project are not properly documented or are unclear, please raise an issueand let us know! This is a fun, safe environment - don't worry if you're a GitHub newbie! :heart:
 
-* [Quick Start Guide](https://github.com/rubrikinc/use-case-jenkins-live-mount/docs/QUICKSTART.md)
+* [Quick Start Guide](https://github.com/rubrikinc/use-case-jenkins-live-mount/blob/master/docs/QUICKSTART.md)
 * [Rubrik API Documentation](https://github.com/rubrikinc/api-documentation)
 
 ## :muscle: How You Can Help
