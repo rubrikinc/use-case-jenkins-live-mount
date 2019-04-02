@@ -66,7 +66,7 @@ node{
                         else
                           printf '%s\n' "Package $PACKAGE Already Installed"
                         fi
-                        cat > /var/www/html/data.php <<< EOF
+cat > /var/www/html/data.php << EOF
 <html>
     <head>
         <title>Results</title>
