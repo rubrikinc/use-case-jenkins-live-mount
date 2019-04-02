@@ -71,7 +71,7 @@ node{
                         
                         wget -P /var/www/html/ https://raw.githubusercontent.com/Draper1/test-public/master/data.php
                         sed -i "s/RUBRIK_LIVEMOUNT_DB/$SQL_DB/g" /var/www/html/data.php
-                        sed -i "s/RUBRIK_SERVER/$SQL_SERVER/g" /var/www/html/data.php
+                        sed -i "s/RUBRIK_SERVER/$SQL_CON/g" /var/www/html/data.php
                         sed -i "s/SQL_USER/$USERNAMESQL/g" /var/www/html/data.php
                         sed -i "s/SQL_PASSWORD/$PASSWORDSQL/g" /var/www/html/data.php
                     '''
