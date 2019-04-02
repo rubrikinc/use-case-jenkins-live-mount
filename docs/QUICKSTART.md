@@ -56,6 +56,7 @@ sudo yum install unixODBC-devel
 ```
 
 * Github plugin for Jenkins
+* For this example, we have a downstream node configured to host a webserver
 
 ## Project Credentials
 

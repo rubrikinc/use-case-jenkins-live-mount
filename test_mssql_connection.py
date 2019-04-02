@@ -20,7 +20,8 @@ sql_pass = args.password
 print "Connecting to "+sql_host+"\\"+sql_instance+" and DB: "+sql_db_name+"-"+sql_mount_suffix
 cnxn = pyodbc.connect("Driver={ODBC Driver 13 for SQL Server};Server="+sql_host+"\\"+sql_instance+",1433;Database="+sql_db_name+"-"+sql_mount_suffix+";UID="+sql_user+";PWD="+sql_pass)
 cursor = cnxn.cursor()
-cursor.execute('SELECT TOP 10 [FirstName] FROM Person.Person')
-
-for row in cursor:
-    print('row = %r' % (row,))
+cursor.execute("SELECT @@version;")
+row = cursor.fetchone()
+while row:
+    print row[0]
+    row = cursor.fetchone()
